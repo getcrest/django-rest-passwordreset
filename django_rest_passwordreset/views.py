@@ -44,7 +44,8 @@ class ResetPasswordValidateToken(GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            return Response({'status': 'Invalid Token'}, status=403)
         return Response({'status': 'OK'})
 
 
@@ -77,9 +78,11 @@ class ResetPasswordConfirm(GenericAPIView):
                 )
             except ValidationError as e:
                 # raise a validation error for the serializer
-                raise exceptions.ValidationError({
-                    'password': e.messages
-                })
+                # raise exceptions.ValidationError({
+                #     'password': e.messages
+                # })
+                return Response({'message': 'FAILURE', 'is_valid': False, 'successful': False,
+                                 'error_message': e.messages}, status=400)
 
             reset_password_token.user.set_password(password)
             reset_password_token.user.save()
@@ -88,7 +91,7 @@ class ResetPasswordConfirm(GenericAPIView):
         # Delete all password reset tokens for this user
         ResetPasswordToken.objects.filter(user=reset_password_token.user).delete()
 
-        return Response({'status': 'OK'})
+        return Response({'message': 'SUCCESS', 'is_valid': True, 'successful': True})
 
 
 class ResetPasswordRequestToken(GenericAPIView):
@@ -131,10 +134,11 @@ class ResetPasswordRequestToken(GenericAPIView):
         # No active user found, raise a validation error
         # but not if DJANGO_REST_PASSWORDRESET_NO_INFORMATION_LEAKAGE == True
         if not active_user_found and not getattr(settings, 'DJANGO_REST_PASSWORDRESET_NO_INFORMATION_LEAKAGE', False):
-            raise exceptions.ValidationError({
-                'email': [_(
-                    "We couldn't find an account associated with that email. Please try a different e-mail address.")],
-            })
+            # raise exceptions.ValidationError({
+            #     'email': [_(
+            #         "We couldn't find an account associated with that email. Please try a different e-mail address.")],
+            # })
+            return Response({'message':'FAILURE', 'email_valid': False, 'mail_sent': False}, status=500)
 
         # last but not least: iterate over all users that are active and can change their password
         # and create a Reset Password Token and send a signal with the created token
@@ -158,7 +162,7 @@ class ResetPasswordRequestToken(GenericAPIView):
                 # let whoever receives this signal handle sending the email for the password reset
                 reset_password_token_created.send(sender=self.__class__, instance=self, reset_password_token=token)
         # done
-        return Response({'status': 'OK'})
+        return Response({'message':'FAILURE', 'email_valid': True, 'mail_sent': True})
 
 
 class ResetPasswordValidateTokenViewSet(ResetPasswordValidateToken, GenericViewSet):
