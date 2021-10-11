@@ -84,8 +84,12 @@ class ResetPasswordConfirm(GenericAPIView):
                 return Response({'message': 'FAILURE', 'is_valid': False, 'successful': False,
                                  'error_message': e.messages}, status=400)
 
-            reset_password_token.user.set_password(password)
-            reset_password_token.user.save()
+            try:
+                reset_password_token.user.set_password(password)
+                reset_password_token.user.save()
+            except Exception as e:
+                return Response({'message': 'FAILURE', 'is_valid': True, 'successful': False,
+                                 'error_message': 'Password reset error'}, status=400)
             post_password_reset.send(sender=self.__class__, user=reset_password_token.user)
 
         # Delete all password reset tokens for this user
