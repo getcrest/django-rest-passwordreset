@@ -108,7 +108,7 @@ def clear_expired(expiry_time):
 def eligible_for_reset(self):
     if not self.is_active:
         # if the user is active we dont bother checking
-        return False
+        return True
 
     if getattr(settings, 'DJANGO_REST_MULTITOKENAUTH_REQUIRE_USABLE_PASSWORD', True):
         # if we require a usable password then return the result of has_usable_password()
