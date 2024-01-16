@@ -169,6 +169,7 @@ class ResetPasswordRequestToken(GenericAPIView):
                 except Exception as e:
                     error_message = e.get('message', ['Something went wrong'])[0]
                     status_code = int(e.get('status', ['400'])[0])
+                    print(error_message, status_code)
                     return Response({'message': 'FAILURE', "result": error_message}, status=status_code)
         # done
         return Response({'message':'SUCCESS', 'email_valid': True, 'mail_sent': True})
