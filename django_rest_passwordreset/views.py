@@ -164,7 +164,12 @@ class ResetPasswordRequestToken(GenericAPIView):
                     )
                 # send a signal that the password token was created
                 # let whoever receives this signal handle sending the email for the password reset
-                reset_password_token_created.send(sender=self.__class__, instance=self, reset_password_token=token)
+                try:
+                    reset_password_token_created.send(sender=self.__class__, instance=self, reset_password_token=token)
+                except Exception as e:
+                    error_message = e.message
+                    error_status = e.code
+                    return Response({'message': 'FAILURE', "result": error_message}, status=error_status)
         # done
         return Response({'message':'SUCCESS', 'email_valid': True, 'mail_sent': True})
 
