@@ -15,6 +15,7 @@ from django_rest_passwordreset.models import ResetPasswordToken, clear_expired, 
     get_password_reset_lookup_field
 from django_rest_passwordreset.serializers import EmailSerializer, PasswordTokenSerializer, ResetTokenSerializer
 from django_rest_passwordreset.signals import reset_password_token_created, pre_password_reset, post_password_reset
+from django_rest_passwordreset.utils import get_referer_meta
 
 User = get_user_model()
 
@@ -165,7 +166,7 @@ class ResetPasswordRequestToken(GenericAPIView):
                 # send a signal that the password token was created
                 # let whoever receives this signal handle sending the email for the password reset
                 try:
-                    reset_password_token_created.send(sender=self.__class__, instance=self, reset_password_token=token)
+                    reset_password_token_created.send(sender=self.__class__, instance=self, reset_password_token=token, app=get_referer_meta(request))
                 except Exception as e:
                     error_message = e.message
                     error_status = e.code
