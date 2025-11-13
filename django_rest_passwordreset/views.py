@@ -110,6 +110,7 @@ class ResetPasswordRequestToken(GenericAPIView):
     serializer_class = EmailSerializer
 
     def post(self, request, *args, **kwargs):
+        print('Reset password enter')
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
@@ -166,10 +167,12 @@ class ResetPasswordRequestToken(GenericAPIView):
                 # send a signal that the password token was created
                 # let whoever receives this signal handle sending the email for the password reset
                 try:
+                    print('Reset password enter reset_password_token_created')
                     reset_password_token_created.send(sender=self.__class__, instance=self, reset_password_token=token, app=get_referer_meta(request))
                 except Exception as e:
                     error_message = e.message
                     error_status = e.code
+                    print(e)
                     return Response({'message': 'FAILURE', "result": error_message}, status=error_status)
         # done
         return Response({'message':'SUCCESS', 'email_valid': True, 'mail_sent': True})
