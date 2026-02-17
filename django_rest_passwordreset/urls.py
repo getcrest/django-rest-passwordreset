@@ -1,5 +1,5 @@
 """ URL Configuration for core auth """
-from django.urls import url
+from django.urls import re_path
 
 from django_rest_passwordreset.views import ResetPasswordValidateTokenViewSet, ResetPasswordConfirmViewSet, \
     ResetPasswordRequestTokenViewSet, reset_password_validate_token, reset_password_confirm, \
@@ -27,7 +27,7 @@ def add_reset_password_urls_to_router(router, base_path=''):
 
 
 urlpatterns = [
-    url(r'^validate_token/', reset_password_validate_token, name="reset-password-validate"),
-    url(r'^confirm/', reset_password_confirm, name="reset-password-confirm"),
-    url(r'^', reset_password_request_token, name="reset-password-request"),
+    re_path(r'^validate_token/', reset_password_validate_token, name="reset-password-validate"),
+    re_path(r'^confirm/', reset_password_confirm, name="reset-password-confirm"),
+    re_path(r'^', reset_password_request_token, name="reset-password-request"),
 ]
