@@ -1,5 +1,5 @@
 """ Tests App URL Config """
-from django.conf.urls import url, include
+from django.urls import url, include
 from django.contrib import admin
 
 

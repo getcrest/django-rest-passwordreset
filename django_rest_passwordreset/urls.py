@@ -1,5 +1,5 @@
 """ URL Configuration for core auth """
-from django.conf.urls import url
+from django.urls import url
 
 from django_rest_passwordreset.views import ResetPasswordValidateTokenViewSet, ResetPasswordConfirmViewSet, \
     ResetPasswordRequestTokenViewSet, reset_password_validate_token, reset_password_confirm, \
